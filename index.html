@@ -16,9 +16,11 @@
       --mist: #f0f4fa;
       --surface: #ffffff;
       --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     html, body { margin: 0; }
 
     body {
@@ -27,8 +29,26 @@
       color: var(--deep);
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
+      overflow-x: hidden;
     }
     a { color: inherit; }
+
+    /* ambient background glow */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(60% 40% at 50% -5%, rgba(59,130,246,0.16), transparent 70%),
+        radial-gradient(45% 35% at 85% 30%, rgba(37,99,235,0.10), transparent 70%),
+        radial-gradient(50% 40% at 10% 70%, rgba(147,197,253,0.14), transparent 70%);
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      0% { transform: translate3d(0,0,0) scale(1); }
+      100% { transform: translate3d(0,-2%,0) scale(1.05); }
+    }
 
     .page-surface {
       max-width: 760px;
@@ -38,12 +58,30 @@
 
     /* ---------- header ---------- */
     .site-header {
-      position: relative;
+      position: sticky;
+      top: 0;
+      z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 72px;
+      height: 64px;
       margin-bottom: 28px;
+      transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease), backdrop-filter 0.4s var(--ease);
+    }
+    .site-header.scrolled {
+      background: rgba(240,244,250,0.72);
+      backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      box-shadow: 0 1px 0 rgba(10,22,40,0.06);
+    }
+    .header-inner {
+      position: relative;
+      width: 100%;
+      max-width: 760px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .logo-centered {
       font-size: 15px;
@@ -51,15 +89,17 @@
       letter-spacing: 0.34em;
       text-decoration: none;
       color: var(--deep);
+      transition: opacity 0.2s var(--ease);
     }
+    .logo-centered:hover { opacity: 0.6; }
     .contact-link {
       position: absolute;
-      right: 0;
+      right: 28px;
       display: inline-flex;
       color: var(--faint);
-      transition: color 0.2s ease;
+      transition: color 0.25s var(--ease), transform 0.25s var(--ease);
     }
-    .contact-link:hover { color: var(--accent); }
+    .contact-link:hover { color: var(--accent); transform: translateY(-1px); }
 
     /* ---------- hero ---------- */
     .hero { text-align: center; padding: 36px 0 8px; }
@@ -77,16 +117,30 @@
       -webkit-text-fill-color: transparent;
     }
     .hero .taglines {
-      margin: 22px 0 0;
+      margin: 0 0 18px;
       font-size: 17px;
       color: var(--muted);
       letter-spacing: 0.01em;
     }
     .hero .taglines b { color: var(--deep); font-weight: 600; }
     .hero .sub {
-      margin: 12px 0 0;
+      margin: 14px 0 0;
       font-size: 16px;
       color: var(--faint);
+    }
+
+    /* hero entrance stagger */
+    .rise {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: rise 0.9s var(--ease) forwards;
+    }
+    .rise.d1 { animation-delay: 0.05s; }
+    .rise.d2 { animation-delay: 0.18s; }
+    .rise.d3 { animation-delay: 0.31s; }
+    .rise.d4 { animation-delay: 0.46s; }
+    @keyframes rise {
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ---------- the orb (hero visual) ---------- */
@@ -99,27 +153,39 @@
       margin: 16px 0 8px;
     }
     .orb {
+      position: relative;
       width: 220px; height: 220px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, #93c5fd, var(--accent) 55%, var(--deep-mid) 100%);
       box-shadow: 0 30px 80px -20px rgba(37,99,235,0.55);
-      animation: float 7s ease-in-out infinite;
+      animation: float 8s var(--ease) infinite;
+    }
+    .orb::before {
+      content: ""; position: absolute; inset: -2px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, rgba(147,197,253,0.0), rgba(147,197,253,0.55), rgba(37,99,235,0.0), rgba(147,197,253,0.0));
+      filter: blur(6px);
+      animation: spin 14s linear infinite;
+      z-index: -1;
     }
     .orb::after {
       content: ""; position: absolute; inset: -40px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(59,130,246,0.18), transparent 65%);
-      animation: pulse 4s ease-in-out infinite;
+      animation: pulse 5s ease-in-out infinite;
       z-index: -1;
     }
     .orb-ring {
       position: absolute; border: 1px solid rgba(37,99,235,0.18);
       border-radius: 50%;
+      animation: breathe 9s ease-in-out infinite;
     }
     .orb-ring.r1 { width: 300px; height: 300px; }
-    .orb-ring.r2 { width: 380px; height: 380px; border-color: rgba(37,99,235,0.10); }
-    @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-14px) scale(1.03); } }
-    @keyframes pulse { 0%,100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.08); } }
+    .orb-ring.r2 { width: 380px; height: 380px; border-color: rgba(37,99,235,0.10); animation-delay: 0.6s; }
+    @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-16px) scale(1.03); } }
+    @keyframes pulse { 0%,100% { opacity: 0.45; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.1); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes breathe { 0%,100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.04); opacity: 1; } }
 
     /* ---------- you intro ---------- */
     .you-intro {
@@ -159,6 +225,15 @@
       margin: 0 auto;
     }
 
+    /* scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+      will-change: opacity, transform;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
     /* visual frame — drop real imagery in here later */
     .visual {
       margin-top: 30px;
@@ -167,6 +242,11 @@
       background: var(--surface);
       overflow: hidden;
       box-shadow: 0 24px 60px -36px rgba(10,22,40,0.45);
+      transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+    }
+    .visual:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 34px 70px -34px rgba(37,99,235,0.4);
     }
 
     /* — time navigation visual — */
@@ -182,13 +262,23 @@
     }
     .track .fill {
       position: absolute; left: 0; top: 0; height: 100%;
-      width: 64%;
+      width: 0;
       background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+      transition: width 1.4s var(--ease);
     }
+    .reveal.in .track .fill { width: 64%; }
     .nodes { display: flex; justify-content: space-between; }
     .node { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
-    .node.on .dot { background: var(--accent); box-shadow: 0 0 0 5px rgba(37,99,235,0.15); }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); transition: background 0.4s var(--ease); }
+    .node.on .dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(37,99,235,0.15);
+      animation: nodepulse 2.6s ease-in-out infinite;
+    }
+    @keyframes nodepulse {
+      0%,100% { box-shadow: 0 0 0 4px rgba(37,99,235,0.16); }
+      50% { box-shadow: 0 0 0 8px rgba(37,99,235,0.06); }
+    }
     .node small { font-size: 11px; color: var(--faint); letter-spacing: 0.04em; }
     .node.on small { color: var(--accent); font-weight: 600; }
 
@@ -203,13 +293,17 @@
       background: var(--surface);
       padding: 28px 18px;
       text-align: center;
+      transition: background 0.35s var(--ease);
     }
+    .agent .cell:hover { background: #f7faff; }
     .agent .glyph {
       width: 44px; height: 44px; margin: 0 auto 12px;
       border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       background: #eff6ff; color: var(--accent);
+      transition: transform 0.35s var(--ease);
     }
+    .agent .cell:hover .glyph { transform: translateY(-2px) scale(1.05); }
     .agent .cell span { font-size: 13px; color: var(--muted); }
     .agent .done { color: var(--accent); font-weight: 600; }
 
@@ -224,13 +318,16 @@
       width: 72px; height: 72px; border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, #bfdbfe, var(--accent) 70%);
       opacity: 0.9;
+      animation: float 7s var(--ease) infinite;
     }
-    .mini-orb.b { width: 96px; height: 96px; }
-    .mini-orb.c { width: 56px; height: 56px; opacity: 0.75; }
+    .mini-orb.b { width: 96px; height: 96px; animation-delay: 0.5s; }
+    .mini-orb.c { width: 56px; height: 56px; opacity: 0.75; animation-delay: 1s; }
     .minds .link {
       position: absolute; height: 1px; width: 120px; top: 50%;
       background: linear-gradient(90deg, transparent, rgba(37,99,235,0.5), transparent);
+      animation: shimmer 3.5s ease-in-out infinite;
     }
+    @keyframes shimmer { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
 
     /* ---------- footer ---------- */
     .site-footer {
@@ -248,11 +345,23 @@
       .orb-stage { height: 260px; }
       .orb { width: 170px; height: 170px; }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      html { scroll-behavior: auto; }
+      .rise, .reveal { opacity: 1; transform: none; }
+      .reveal.in .track .fill { width: 64%; }
+    }
   </style>
 </head>
 <body>
-  <div class="page-surface">
-    <header class="site-header">
+  <div class="ambient"></div>
+
+  <header class="site-header" id="header">
+    <div class="header-inner">
       <a href="/" class="logo-centered">REP</a>
       <!-- TODO: replace with your real contact address -->
       <a href="mailto:hello@rep.so" class="contact-link" aria-label="Contact" title="Contact">
@@ -263,31 +372,33 @@
           </g>
         </svg>
       </a>
-    </header>
+    </div>
+  </header>
 
+  <div class="page-surface">
     <main>
       <!-- ============ HERO ============ -->
       <section class="hero">
-        <p class="taglines"><b>Your spokesperson.</b> &nbsp;·&nbsp; <b>Your time machine.</b></p>
-        <h1>You. <span class="accent">Digitalized.</span></h1>
-        <p class="sub">Store it. Share it. Get rewarded.</p>
+        <p class="taglines rise d1"><b>Your spokesperson.</b> &nbsp;·&nbsp; <b>Your time machine.</b></p>
+        <h1 class="rise d2">You. <span class="accent">Digitalized.</span></h1>
+        <p class="sub rise d3">Store it. Share it. Get rewarded.</p>
       </section>
 
       <!-- hero visual: the mind-orb. Swap for a real render/video later. -->
-      <div class="orb-stage">
+      <div class="orb-stage rise d4">
         <div class="orb-ring r2"></div>
         <div class="orb-ring r1"></div>
         <div class="orb"></div>
       </div>
 
       <!-- ============ YOU ============ -->
-      <section class="you-intro">
+      <section class="you-intro reveal">
         <h2>You</h2>
         <p>A living version of you — your opinions, your experiences, your beliefs — that grows alongside you and represents you in the world.</p>
       </section>
 
       <!-- ============ NAVIGATE THROUGH TIME ============ -->
-      <section class="block">
+      <section class="block reveal">
         <h2>Your time machine</h2>
         <p>Look back on who you were — what you actually thought and believed, not just the photos.</p>
         <!-- VISUAL: replace .timeline with an image/screenshot of the time view -->
@@ -305,7 +416,7 @@
       </section>
 
       <!-- ============ MAKE IT WORK ============ -->
-      <section class="block">
+      <section class="block reveal">
         <h2>Your spokesperson</h2>
         <p>Your agent knows and represents you in tedious exchanges — accurately, on your terms.</p>
         <!-- VISUAL: replace .agent with product screenshots -->
@@ -315,7 +426,7 @@
               <div class="glyph">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="3" y="11" width="18" height="11" rx="2"/></svg>
               </div>
-              <span>Surveys & forms</span><br><span class="done">handled</span>
+              <span>Surveys &amp; forms</span><br><span class="done">handled</span>
             </div>
             <div class="cell">
               <div class="glyph">
@@ -334,7 +445,7 @@
       </section>
 
       <!-- ============ SHARED MINDS ============ -->
-      <section class="block">
+      <section class="block reveal">
         <h2>Store &amp; share your mind</h2>
         <p>Store it. Share it. Get rewarded.</p>
         <!-- VISUAL: replace .minds with a real graphic -->
@@ -349,9 +460,28 @@
       </section>
     </main>
 
-    <footer class="site-footer">
+    <footer class="site-footer reveal">
       <p>REP · a digital version of you</p>
     </footer>
   </div>
+
+  <script>
+    // sticky header blur on scroll
+    const header = document.getElementById('header');
+    const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // scroll reveal
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
 </body>
 </html>
