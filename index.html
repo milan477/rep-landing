@@ -33,6 +33,27 @@
     }
     a { color: inherit; }
 
+    /* film grain overlay */
+    .grain {
+      position: fixed;
+      inset: -150%;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grainshift 0.6s steps(2) infinite;
+    }
+    @keyframes grainshift {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(-3%, 2%); }
+      50%  { transform: translate(2%, -3%); }
+      75%  { transform: translate(-2%, -2%); }
+      100% { transform: translate(3%, 3%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .grain { animation: none; }
+    }
+
     /* ambient background glow */
     .ambient {
       position: fixed;
@@ -152,13 +173,19 @@
       justify-content: center;
       margin: 56px 0 8px;
     }
-    .orb {
+    .orb-bob {
       position: relative;
       width: 220px; height: 220px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, #93c5fd, var(--accent) 55%, var(--deep-mid) 100%);
       box-shadow: 0 30px 80px -20px rgba(37,99,235,0.55);
-      animation: float 8s var(--ease) infinite;
+      animation: bob 2.8s ease-in-out infinite;
+    }
+    .orb {
+      position: relative;
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #93c5fd, var(--accent) 55%, var(--deep-mid) 100%);
+      animation: spin 9s linear infinite;
     }
     .orb::before {
       content: ""; position: absolute; inset: -2px;
@@ -183,6 +210,7 @@
     .orb-ring.r1 { width: 300px; height: 300px; }
     .orb-ring.r2 { width: 380px; height: 380px; border-color: rgba(37,99,235,0.10); animation-delay: 0.6s; }
     @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-16px) scale(1.03); } }
+    @keyframes bob { 0%,100% { transform: translateY(7px); } 50% { transform: translateY(-7px); } }
     @keyframes pulse { 0%,100% { opacity: 0.45; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.1); } }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes breathe { 0%,100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.04); opacity: 1; } }
@@ -277,15 +305,26 @@
     .reveal.in .track .fill { width: 64%; }
     .nodes { display: flex; justify-content: space-between; }
     .node { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); transition: background 0.4s var(--ease); }
+    .dot { position: relative; width: 12px; height: 12px; border-radius: 50%; background: var(--line); transition: background 0.4s var(--ease); }
     .node.on .dot {
       background: var(--accent);
-      box-shadow: 0 0 0 5px rgba(37,99,235,0.15);
-      animation: nodepulse 2.6s ease-in-out infinite;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.16);
     }
-    @keyframes nodepulse {
-      0%,100% { box-shadow: 0 0 0 4px rgba(37,99,235,0.16); }
-      50% { box-shadow: 0 0 0 8px rgba(37,99,235,0.06); }
+    /* flowing ripple — rings rise outward through escalating tiers, never stopping */
+    .node.on .dot::before,
+    .node.on .dot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent);
+      animation: noderipple 2.6s var(--ease) infinite;
+    }
+    .node.on .dot::after { animation-delay: 1.3s; }
+    @keyframes noderipple {
+      0%   { transform: scale(1);   opacity: 0.55; }
+      70%  { opacity: 0.12; }
+      100% { transform: scale(3.4); opacity: 0; }
     }
     .node small { font-size: 11px; color: var(--faint); letter-spacing: 0.04em; }
     .node.on small { color: var(--accent); font-weight: 600; }
@@ -355,7 +394,8 @@
       z-index: 2;
       animation: float 7s var(--ease) infinite;
     }
-    .stream .chip {
+    .stream .chip,
+    .orb-stage .chip {
       position: absolute;
       left: -30%;
       font-size: 11px;
@@ -368,19 +408,126 @@
       white-space: nowrap;
       box-shadow: 0 6px 16px -10px rgba(10,22,40,0.4);
       opacity: 0;
-      animation: flow 6s linear infinite;
+      animation: flow 9s linear infinite;
     }
-    .stream .chip.c1 { top: 24%;  animation-delay: 0s; }
-    .stream .chip.c2 { top: 44%;  animation-delay: 1.2s; }
-    .stream .chip.c3 { top: 64%;  animation-delay: 2.4s; }
-    .stream .chip.c4 { top: 34%;  animation-delay: 3.6s; }
-    .stream .chip.c5 { top: 56%;  animation-delay: 4.8s; }
+    /* chips arriving from the right mirror in along the opposite edge */
+    .stream .chip.from-right,
+    .orb-stage .chip.from-right {
+      left: auto;
+      right: -30%;
+      animation-name: flow-right;
+    }
+    .stream .chip.c1, .orb-stage .chip.c1 { top: 24%;  animation-delay: 0s; }
+    .stream .chip.c2, .orb-stage .chip.c2 { top: 44%;  animation-delay: 1.2s; }
+    .stream .chip.c3, .orb-stage .chip.c3 { top: 64%;  animation-delay: 2.4s; }
+    .stream .chip.c4, .orb-stage .chip.c4 { top: 34%;  animation-delay: 3.6s; }
+    .stream .chip.c5, .orb-stage .chip.c5 { top: 56%;  animation-delay: 4.8s; }
     @keyframes flow {
-      0%   { left: -34%; opacity: 0; transform: scale(0.9); }
-      12%  { opacity: 1; }
-      46%  { left: 42%; opacity: 1; transform: scale(1); }
-      60%  { left: 50%; opacity: 0; transform: scale(0.6); }
-      100% { left: 50%; opacity: 0; }
+      0%   { left: -30%; opacity: 0; transform: scale(0.85); }
+      18%  { opacity: 1; transform: scale(1); }
+      55%  { left: 30%; opacity: 0; transform: scale(0.6); }
+      100% { left: 30%; opacity: 0; }
+    }
+    @keyframes flow-right {
+      0%   { right: -30%; opacity: 0; transform: scale(0.85); }
+      18%  { opacity: 1; transform: scale(1); }
+      55%  { right: 30%; opacity: 0; transform: scale(0.6); }
+      100% { right: 30%; opacity: 0; }
+    }
+
+    /* — always-learning graph: inputs wired into the mind — */
+    .mindgraph { width: 100%; height: auto; display: block; overflow: visible; }
+    .mindgraph .edge {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 9;
+      stroke-linecap: round;
+      opacity: 0.5;
+      animation: edgeflow 2.4s linear infinite;
+    }
+    .mindgraph .edge.e2 { animation-delay: 0.6s; }
+    .mindgraph .edge.e3 { animation-delay: 1.2s; }
+    .mindgraph .edge.e4 { animation-delay: 1.8s; }
+    @keyframes edgeflow { to { stroke-dashoffset: -26; } }
+    @keyframes edgeflowback { to { stroke-dashoffset: 26; } }
+
+    /* — connects-you-to-friends: two minds trading slices — */
+    .swap { width: 100%; height: auto; display: block; overflow: visible; }
+    .swap .wire {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 9;
+      stroke-linecap: round;
+      opacity: 0.55;
+    }
+    .swap .wire.out  { animation: edgeflow 2.4s linear infinite; }
+    .swap .wire.back { animation: edgeflowback 2.4s linear infinite; }
+    .swap .peer {
+      transform-box: fill-box;
+      transform-origin: center;
+      filter: drop-shadow(0 6px 18px rgba(37,99,235,0.4));
+      animation: hubpulse 4s var(--ease) infinite;
+    }
+    .swap .peer.you    { fill: var(--accent); }
+    .swap .peer.friend { fill: #bfdbfe; stroke: var(--accent); stroke-width: 1.5; animation-delay: 1.2s; }
+    .swap .peer-label {
+      fill: var(--deep);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .swap * { animation: none !important; }
+    }
+
+    .mindgraph .hub {
+      fill: var(--accent);
+      transform-box: fill-box;
+      transform-origin: center;
+      filter: drop-shadow(0 6px 20px rgba(37,99,235,0.5));
+      animation: hubpulse 4s var(--ease) infinite;
+    }
+    .mindgraph .hub-ring {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1;
+      opacity: 0.3;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: hubring 4s var(--ease) infinite;
+    }
+    @keyframes hubpulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+    @keyframes hubring  { 0%,100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.18); opacity: 0.08; } }
+
+    .mindgraph .gnode circle {
+      fill: var(--surface);
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: nodebeat 4s var(--ease) infinite;
+    }
+    .mindgraph .gnode.n2 circle { animation-delay: 0.6s; }
+    .mindgraph .gnode.n3 circle { animation-delay: 1.2s; }
+    .mindgraph .gnode.n4 circle { animation-delay: 1.8s; }
+    @keyframes nodebeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+    .mindgraph .gnode text {
+      fill: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--font-sans);
+    }
+    .mindgraph .hub-label {
+      fill: var(--deep);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-family: var(--font-sans);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mindgraph * { animation: none !important; }
     }
 
     /* ---------- buttons ---------- */
@@ -428,13 +575,8 @@
     .action {
       margin-top: 130px;
       text-align: center;
-      border-radius: 28px;
-      padding: 64px 32px;
-      background:
-        radial-gradient(120% 100% at 50% 0%, rgba(59,130,246,0.14), transparent 70%),
-        var(--surface);
-      border: 1px solid var(--line);
-      box-shadow: 0 30px 80px -50px rgba(37,99,235,0.5);
+      padding: 48px 32px;
+      background: transparent;
     }
     .action h2 {
       font-size: clamp(30px, 5vw, 44px);
@@ -464,7 +606,25 @@
       color: var(--faint);
       font-size: 13px;
     }
-    .site-footer a { color: var(--accent); text-decoration: none; }
+    .site-footer a { color: var(--accent); text-decoration: none; transition: color 0.3s var(--ease); }
+    .site-footer a:hover { color: var(--ink); }
+    .footer-brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .footer-brand .accent { color: var(--accent); }
+    .footer-tagline { max-width: 360px; margin: 0 auto 18px; line-height: 1.6; }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+    .footer-meta { color: var(--faint); opacity: 0.8; }
 
     @media (max-width: 560px) {
       .agent { grid-template-columns: 1fr; }
@@ -485,6 +645,7 @@
 </head>
 <body>
   <div class="ambient"></div>
+  <div class="grain"></div>
 
   <header class="site-header" id="header">
     <div class="header-inner">
@@ -506,10 +667,10 @@
       <!-- ============ WHAT IT IS / HERO ============ -->
       <section class="hero">
         <h1 class="rise d1">You. <span class="accent">Digitalized.</span></h1>
-        <p class="sub rise d2">A living version of you — your opinions, your experiences, your beliefs — that grows alongside you and represents you in the world.</p>
+        <p class="sub rise d2">A living version of you that grows alongside you and represents you in the world.</p>
         <div class="cta-row rise d3">
-          <a class="btn btn-subtle" href="#start">Store your mind</a>
-          <a class="btn btn-subtle" href="#start">Share your mind</a>
+          <!-- <a class="btn btn-subtle" href="#start">Store your mind</a>
+          <a class="btn btn-subtle" href="#start">Share your mind</a> -->
         </div>
       </section>
 
@@ -517,14 +678,79 @@
       <div class="orb-stage rise d4">
         <div class="orb-ring r2"></div>
         <div class="orb-ring r1"></div>
-        <div class="orb"></div>
+        <div class="orb-bob"><div class="orb"></div></div>
+        <span class="chip c1">"Hey, can you help me move?"</span>
+        <span class="chip c2 from-right">I feel bad about animals in cages</span>
+        <span class="chip c3">I loved the Tikka Masala at this restaurant</span>
+        <span class="chip c4 from-right">Dating is such a hassle</span>
+        <span class="chip c5">I take the BART to work every day</span>
       </div>
+
+      <!-- ============ BENEFIT · PERPETUAL COGNITION (orb above is its visual) ============ -->
+      <section class="block reveal">
+        <!-- <p class="eyebrow">Perpetual cognition</p> -->
+        <h2>It learns therefore it knows</h2>
+        <p>It captures context continuously so your digital self stays complete and current.</p>
+        <div class="visual">
+          <svg class="mindgraph" viewBox="0 0 600 300" role="img" aria-label="Your mind connected to everyday inputs">
+            <!-- edges: inputs flowing into the mind -->
+            <line class="edge e1" x1="130" y1="70"  x2="300" y2="150" />
+            <line class="edge e2" x1="130" y1="230" x2="300" y2="150" />
+            <line class="edge e3" x1="470" y1="70"  x2="300" y2="150" />
+            <line class="edge e4" x1="470" y1="230" x2="300" y2="150" />
+
+            <!-- the mind -->
+            <circle class="hub-ring" cx="300" cy="150" r="34" />
+            <circle class="hub" cx="300" cy="150" r="24" />
+            <text class="hub-label" x="300" y="200" text-anchor="middle"></text>
+
+            <!-- input nodes -->
+            <g class="gnode n1">
+              <circle cx="130" cy="70" r="6" />
+              <text x="130" y="50" text-anchor="middle">your opinions</text>
+            </g>
+            <g class="gnode n2">
+              <circle cx="130" cy="230" r="6" />
+              <text x="130" y="254" text-anchor="middle">your activity</text>
+            </g>
+            <g class="gnode n3">
+              <circle cx="470" cy="70" r="6" />
+              <text x="470" y="50" text-anchor="middle">your knowledge</text>
+            </g>
+            <g class="gnode n4">
+              <circle cx="470" cy="230" r="6" />
+              <text x="470" y="254" text-anchor="middle">your experiences</text>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ============ BENEFIT · TIME MACHINE ============ -->
+      <section class="block reveal">
+        <p class="eyebrow">Time machine</p>
+        <h2>Lets you time travel</h2>
+        <p>Learn about who you were and what you thought at any point in time.</p>
+        <!-- VISUAL: replace .timeline with an image/screenshot of the time view -->
+        <div class="visual">
+          <div class="timeline">
+            <div class="nodes">
+              <div class="node"><span class="dot"></span><small>2019</small></div>
+              <div class="node on"><span class="dot"></span><small>before moving to SF</small></div>
+              <!-- <div class="node"><span class="dot"></span><small>2023</small></div> -->
+              <div class="node"><span class="dot"></span><small>today</small></div>
+            </div>
+            <div class="track"><span class="fill"></span></div>
+          </div>
+        </div>
+      </section>
+
+      
 
       <!-- ============ BENEFIT · SPOKESPERSON ============ -->
       <section class="block reveal">
-        <p class="eyebrow">Spokesperson</p>
-        <h2>Represented, on your terms</h2>
-        <p>Your agent speaks for you so your voice gets heard. Share what you think accurately, but only what you choose. And get rewarded.</p>
+        <p class="eyebrow">Representation</p>
+        <h2>Speaks for you</h2>
+        <p>It speaks for you so you get heard. Share what you think – but only what you choose – and get rewarded for it.</p>
         <!-- VISUAL: replace .agent with product screenshots -->
         <div class="visual">
           <div class="agent">
@@ -538,7 +764,7 @@
               <div class="glyph">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               </div>
-              <span>With friends</span><br><span class="done">shared</span>
+              <span>With friends</span><br><span class="done">exchanged</span>
             </div>
             <div class="cell">
               <div class="glyph">
@@ -550,57 +776,48 @@
         </div>
       </section>
 
-      <!-- ============ BENEFIT · TIME MACHINE ============ -->
-      <section class="block reveal">
-        <p class="eyebrow">Time machine</p>
-        <h2>Look back on your own mind</h2>
-        <p>Return to who you were — what you actually thought and believed at any point, not just the photos.</p>
-        <!-- VISUAL: replace .timeline with an image/screenshot of the time view -->
-        <div class="visual">
-          <div class="timeline">
-            <div class="nodes">
-              <div class="node"><span class="dot"></span><small>2019</small></div>
-              <div class="node on"><span class="dot"></span><small>before the move</small></div>
-              <div class="node"><span class="dot"></span><small>2023</small></div>
-              <div class="node"><span class="dot"></span><small>today</small></div>
-            </div>
-            <div class="track"><span class="fill"></span></div>
-          </div>
-        </div>
-      </section>
 
-      <!-- ============ BENEFIT · PERPETUAL COGNITION ============ -->
-      <section class="block reveal">
-        <p class="eyebrow">Perpetual cognition</p>
-        <h2>Always learning you</h2>
-        <p>It captures context from everything you live, continuously — so your digital self stays complete and current.</p>
-        <!-- VISUAL: replace .stream with a real graphic -->
-        <div class="visual">
-          <div class="stream">
-            <span class="chip c1">a message</span>
-            <span class="chip c2">a conversation</span>
-            <span class="chip c3">a moment</span>
-            <span class="chip c4">an opinion</span>
-            <span class="chip c5">a belief</span>
-            <div class="core"></div>
-          </div>
-        </div>
-      </section>
+    <!-- ============ BENEFIT · FRIENDS ============ -->
+    <section class="block reveal">
+      <p class="eyebrow">Connection</p>
+      <h2>Connects you to friends</h2>
+      <p>Share a slice of your knowledge or opinions with friends. Get theirs back.</p>
+      <div class="visual">
+        <svg class="swap" viewBox="0 0 600 220" role="img" aria-label="You and a friend exchanging slices of mind">
+          <!-- exchange wires -->
+          <path class="wire out"  d="M 200 92  Q 300 36 400 92"  />
+          <path class="wire back" d="M 200 128 Q 300 184 400 128" />
+          <!-- the two minds -->
+          <circle class="peer you"    cx="170" cy="110" r="26" />
+          <circle class="peer friend" cx="430" cy="110" r="26" />
+          <text class="peer-label" x="170" y="168" text-anchor="middle">you</text>
+          <text class="peer-label" x="430" y="168" text-anchor="middle">a friend</text>
+        </svg>
+      </div>
+    </section>
+      
 
       <!-- ============ ACTION ============ -->
       <section class="action reveal" id="start">
-        <h2>Digitalize your mind. <span class="accent">And share pieces of it.</span></h2>
-        <p>Start building the version of you that lasts — and let it represent you in the world.</p>
+        <h2>Digitalize your mind.<br><span class="accent">Share it.</span></h2>
+        <p>Create your own digital representation and share what you choose with friends, businesses, and more.</p>
         <div class="cta-row">
           <!-- TODO: point to the real app / waitlist -->
-          <a class="btn btn-primary" href="#">Get the app</a>
-          <a class="btn btn-ghost" href="mailto:hello@rep.so">Get in touch</a>
+          <a class="btn btn-ghost" href="#">Get started</a>
         </div>
       </section>
     </main>
 
     <footer class="site-footer reveal">
-      <p>REP · a digital version of you</p>
+      <p class="footer-brand">REP<span class="accent">.</span></p>
+      <p class="footer-tagline">A living version of you that grows alongside you and represents you in the world.</p>
+      <nav class="footer-links">
+        <a href="#start">Get the app</a>
+        <a href="mailto:hello@rep.so">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </nav>
+      <p class="footer-meta">© 2026 REP · Built for the version of you that lasts.</p>
     </footer>
   </div>
 
