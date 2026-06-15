@@ -121,6 +121,25 @@
     @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-14px) scale(1.03); } }
     @keyframes pulse { 0%,100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.08); } }
 
+    /* ---------- you intro ---------- */
+    .you-intro {
+      text-align: center;
+      max-width: 540px;
+      margin: 24px auto 0;
+    }
+    .you-intro h2 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 0 0 12px;
+      color: var(--deep);
+    }
+    .you-intro p {
+      font-size: 17px;
+      color: var(--muted);
+      margin: 0;
+    }
+
     /* ---------- section blocks ---------- */
     .block {
       margin-top: 110px;
@@ -249,9 +268,9 @@
     <main>
       <!-- ============ HERO ============ -->
       <section class="hero">
-        <h1>You. <span class="accent">Digitalized.</span></h1>
         <p class="taglines"><b>Your spokesperson.</b> &nbsp;·&nbsp; <b>Your time machine.</b></p>
-        <p class="sub">Store and share your mind with X. Get rewarded.</p>
+        <h1>You. <span class="accent">Digitalized.</span></h1>
+        <p class="sub">Store it. Share it. Get rewarded.</p>
       </section>
 
       <!-- hero visual: the mind-orb. Swap for a real render/video later. -->
@@ -261,10 +280,16 @@
         <div class="orb"></div>
       </div>
 
+      <!-- ============ YOU ============ -->
+      <section class="you-intro">
+        <h2>You</h2>
+        <p>A living version of you — your opinions, your experiences, your beliefs — that grows alongside you and represents you in the world.</p>
+      </section>
+
       <!-- ============ NAVIGATE THROUGH TIME ============ -->
       <section class="block">
         <h2>Your time machine</h2>
-        <p>Go back to who you were — what you actually thought and believed, not just the photos.</p>
+        <p>Look back on who you were — what you actually thought and believed, not just the photos.</p>
         <!-- VISUAL: replace .timeline with an image/screenshot of the time view -->
         <div class="visual">
           <div class="timeline">
@@ -282,7 +307,7 @@
       <!-- ============ MAKE IT WORK ============ -->
       <section class="block">
         <h2>Your spokesperson</h2>
-        <p>Your agent represents you in the tedious exchanges — accurately, on your terms — while you live.</p>
+        <p>Your agent knows and represents you in tedious exchanges — accurately, on your terms.</p>
         <!-- VISUAL: replace .agent with product screenshots -->
         <div class="visual">
           <div class="agent">
@@ -311,7 +336,7 @@
       <!-- ============ SHARED MINDS ============ -->
       <section class="block">
         <h2>Store &amp; share your mind</h2>
-        <p>Keep a slice of yourself and share it with friends — and the businesses eager to listen. Get rewarded. You decide.</p>
+        <p>Store it. Share it. Get rewarded.</p>
         <!-- VISUAL: replace .minds with a real graphic -->
         <div class="visual">
           <div class="minds">
