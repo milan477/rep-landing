@@ -133,6 +133,17 @@
     }
     .contact-link:hover { color: var(--accent); transform: translateY(-1px); }
 
+    /* first screen — hero + orb fill the viewport down to the middle,
+       the next section then flows up automatically as you scroll */
+    .first-screen {
+      min-height: calc(100svh - 92px); /* viewport minus sticky header (64) + its margin (28) */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .first-screen .hero-visual { width: 100%; }
+
     /* ---------- hero ---------- */
     .hero { text-align: center; padding: 36px 0 8px; }
     .hero h1 {
@@ -142,7 +153,15 @@
       font-weight: 600;
       margin: 0;
       color: var(--deep);
+      /* two halves meeting at the center: "Your mind." ends at the middle,
+         the cycling word begins at the middle */
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 0.28em;
+      align-items: baseline;
     }
+    .hero h1 .mind-lead { text-align: right; }
+    .hero h1 .accent { text-align: left; }
     .hero h1 .accent {
       background: linear-gradient(
         120deg,
@@ -155,6 +174,10 @@
       -webkit-text-fill-color: transparent;
       color: transparent;
     }
+    /* cycling synonym word */
+    #mindWord { display: inline-block; text-align: center; transition: opacity 0.45s var(--ease), transform 0.45s var(--ease); }
+    #mindWord.swap { opacity: 0; transform: translateY(-0.3em); }
+    @media (prefers-reduced-motion: reduce) { #mindWord { transition: none; } }
     .hero .taglines {
       margin: 0 0 18px;
       font-size: 17px;
@@ -173,6 +196,25 @@
       color: var(--faint);
     }
 
+    .hero-visual {
+      text-align: center;
+      margin: 0;
+    }
+    .hero-visual .sub {
+      margin: 52px 0 0;
+      font-family: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      font-size: clamp(18px, 3vw, 22px);
+      font-weight: 450;
+      letter-spacing: -0.01em;
+      color: var(--deep);
+    }
+
+    /* chapter break — divider before a new section */
+    .chapter {
+      padding-top: 40px;
+      border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+    }
+
     /* hero entrance stagger */
     .rise {
       opacity: 0;
@@ -184,6 +226,7 @@
     .rise.d3 { animation-delay: 0.31s; }
     .rise.d4 { animation-delay: 0.46s; }
     .rise.d5 { animation-delay: 0.58s; }
+    .rise.d6 { animation-delay: 0.74s; }
     @keyframes rise {
       to { opacity: 1; transform: translateY(0); }
     }
@@ -195,7 +238,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 56px 0 8px;
+      margin: 56px 0 0;
     }
     .orb-bob {
       position: relative;
@@ -293,6 +336,44 @@
       letter-spacing: -0.01em;
       color: var(--deep);
     }
+    .perpetual-section {
+      margin-top: 104px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .perpetual-intro {
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+    }
+    .perpetual-section .eyebrow {
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin: 0 0 10px;
+    }
+    .perpetual-intro p {
+      margin: 0 auto;
+    }
+    .perpetual-section .visual {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 10px;
+    }
+    .perpetual-section .mind-learn-visual {
+      height: 220px;
+    }
+    @media (min-width: 760px) {
+      .perpetual-section .mind-learn-visual { height: 240px; }
+    }
+    @media (min-width: 1000px) {
+      .perpetual-section .mind-learn-visual { height: 260px; }
+    }
+    .perpetual-section .mind-label.tl,
+    .perpetual-section .mind-label.tr { top: 0; }
+    .perpetual-section .mind-label.bl,
+    .perpetual-section .mind-label.br { bottom: 0; }
     .block p {
       font-size: 16px;
       color: var(--muted);
@@ -314,6 +395,63 @@
       margin-top: 30px;
       background: transparent;
       overflow: visible;
+    }
+
+    /* unified benefit visuals — Time travel, Friends, Be represented, Remember everything */
+    .benefit-visual {
+      position: relative;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (min-width: 760px) {
+      .benefit-visual { height: 280px; }
+    }
+    @media (min-width: 1000px) {
+      .benefit-visual { height: 340px; }
+    }
+    .block.benefit-follow {
+      margin-top: 56px;
+    }
+    .benefit-visual .timeline {
+      width: 100%;
+      padding: 0 36px;
+    }
+    .benefit-visual .agent {
+      width: 100%;
+      max-width: 680px;
+    }
+    .benefit-visual .memory-stack {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    /* — remember everything visual — */
+    .memory-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .memory-layer {
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-align: center;
+      border: 1px solid color-mix(in srgb, var(--blue) 32%, transparent);
+      border-radius: 10px;
+      background: var(--blue-bg);
+      line-height: 1.3;
+    }
+    .memory-layer.faded {
+      opacity: 0.5;
+      border-style: dashed;
+      font-size: 16px;
+      letter-spacing: 0.18em;
+      color: var(--faint);
+      padding: 8px 16px;
     }
 
     /* — time navigation visual — */
@@ -340,22 +478,6 @@
     .node.on .dot {
       background: var(--blue);
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 16%, transparent);
-    }
-    /* flowing ripple — rings rise outward through escalating tiers, never stopping */
-    .node.on .dot::before,
-    .node.on .dot::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 1.5px solid var(--blue);
-      animation: noderipple 5s var(--ease) infinite;
-    }
-    .node.on .dot::after { animation-delay: 2.5s; }
-    @keyframes noderipple {
-      0%   { transform: scale(1);   opacity: 0.55; }
-      70%  { opacity: 0.12; }
-      100% { transform: scale(3.4); opacity: 0; }
     }
     .node small { font-size: 11px; color: var(--faint); letter-spacing: 0.04em; }
     .node.on small { color: var(--blue); font-weight: 600; }
@@ -447,7 +569,8 @@
       overflow: visible;
       z-index: 1;
     }
-    .mind-learn-box {
+    .mind-learn-box,
+    .mind-learn-diag {
       fill: none;
       stroke: var(--blue);
       stroke-width: 1.5;
@@ -476,34 +599,41 @@
       background: var(--blue-bg);
       line-height: 1.2;
       white-space: nowrap;
+      will-change: transform;
     }
     .mind-label.tl { top: 12px; left: 14px; }
     .mind-label.bl { bottom: 12px; left: 14px; }
     .mind-label.tr { top: 12px; right: 14px; left: auto; }
     .mind-label.br { bottom: 12px; right: 14px; left: auto; }
 
-    @keyframes learnMoveTL {
-      to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 108px), calc(-50% - 26px)); }
-    }
-    @keyframes learnMoveTR {
-      to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 108px), calc(-50% - 26px)); }
-    }
-    @keyframes learnMoveBL {
-      to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 108px), calc(-50% + 26px)); }
-    }
-    @keyframes learnMoveBR {
-      to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 108px), calc(-50% + 26px)); }
+    @keyframes learnMoveLabel {
+      from {
+        transform: translate(calc(-50% + var(--from-x, 0px)), calc(-50% + var(--from-y, 0px)));
+      }
+      to {
+        transform: translate(calc(-50% + var(--to-x, 0px)), calc(-50% + var(--to-y, 0px)));
+      }
     }
     @keyframes learnBoxDraw {
       to { stroke-dashoffset: 0; opacity: 1; }
     }
 
-    .mind-learn-visual.play .mind-label.tl { animation: learnMoveTL 2s var(--ease) forwards; }
-    .mind-learn-visual.play .mind-label.tr { animation: learnMoveTR 2s var(--ease) forwards; }
-    .mind-learn-visual.play .mind-label.bl { animation: learnMoveBL 2s var(--ease) forwards; }
-    .mind-learn-visual.play .mind-label.br { animation: learnMoveBR 2s var(--ease) forwards; }
+    .mind-learn-visual.play .mind-label {
+      animation: learnMoveLabel 2s var(--ease) forwards;
+    }
     .mind-learn-visual.play .mind-learn-box {
       animation: learnBoxDraw 1.4s 2.1s var(--ease) forwards;
+    }
+    .mind-learn-visual.play .mind-learn-diag1 {
+      animation: learnBoxDraw 0.85s 3.55s var(--ease) forwards;
+    }
+    .mind-learn-visual.play .mind-learn-diag2 {
+      animation: learnBoxDraw 0.85s 3.7s var(--ease) forwards;
+    }
+    .mind-learn-visual.connectors-visible .mind-learn-box,
+    .mind-learn-visual.connectors-visible .mind-learn-diag {
+      stroke-dashoffset: 0;
+      opacity: 1;
     }
 
     @media (min-width: 760px) {
@@ -511,53 +641,18 @@
       .mind-label.bl { bottom: 14px; left: 20px; }
       .mind-label.tr { top: 14px; right: 20px; }
       .mind-label.br { bottom: 14px; right: 20px; }
-      @keyframes learnMoveTL {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 118px), calc(-50% - 28px)); }
-      }
-      @keyframes learnMoveTR {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 118px), calc(-50% - 28px)); }
-      }
-      @keyframes learnMoveBL {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 118px), calc(-50% + 28px)); }
-      }
-      @keyframes learnMoveBR {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 118px), calc(-50% + 28px)); }
-      }
     }
     @media (min-width: 1000px) {
       .mind-label.tl { top: 16px; left: 28px; }
       .mind-label.bl { bottom: 16px; left: 28px; }
       .mind-label.tr { top: 16px; right: 28px; }
       .mind-label.br { bottom: 16px; right: 28px; }
-      @keyframes learnMoveTL {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 128px), calc(-50% - 30px)); }
-      }
-      @keyframes learnMoveTR {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 128px), calc(-50% - 30px)); }
-      }
-      @keyframes learnMoveBL {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 128px), calc(-50% + 30px)); }
-      }
-      @keyframes learnMoveBR {
-        to { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 128px), calc(-50% + 30px)); }
-      }
     }
 
     /* — friends: two orbs exchanging streams — */
     .mind-friends-visual {
       position: relative;
-      height: 220px;
       background: transparent;
-    }
-    @media (min-width: 760px) {
-      .mind-friends-visual { height: 280px; }
-      .mind-friends-label.left  { left: 16%; }
-      .mind-friends-label.right { left: 84%; }
-    }
-    @media (min-width: 1000px) {
-      .mind-friends-visual { height: 340px; }
-      .mind-friends-label.left  { left: 12%; }
-      .mind-friends-label.right { left: 88%; }
     }
     .mind-friends-field {
       position: absolute;
@@ -571,14 +666,13 @@
     }
     .mind-friends-label {
       position: absolute;
-      bottom: 20px;
       font-size: 12px;
       font-weight: 600;
       color: var(--deep);
       font-family: var(--font-sans);
+      white-space: nowrap;
+      transform: translateX(-50%);
     }
-    .mind-friends-label.left  { left: 22%; transform: translateX(-50%); }
-    .mind-friends-label.right { left: 78%; transform: translateX(-50%); }
 
     /* ---------- buttons ---------- */
     .cta-row {
@@ -646,7 +740,6 @@
     .site-footer {
       margin-top: 110px;
       padding-top: 26px;
-      border-top: 1px solid var(--line);
       text-align: center;
       color: var(--faint);
       font-size: 13px;
@@ -687,11 +780,8 @@
       html { scroll-behavior: auto; }
       .rise, .reveal { opacity: 1; transform: none; }
       .reveal.in .track .fill { width: 64%; }
-      .mind-learn-visual.play .mind-label.tl { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 108px), calc(-50% - 26px)); }
-      .mind-learn-visual.play .mind-label.tr { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 108px), calc(-50% - 26px)); }
-      .mind-learn-visual.play .mind-label.bl { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% - 108px), calc(-50% + 26px)); }
-      .mind-learn-visual.play .mind-label.br { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(calc(-50% + 108px), calc(-50% + 26px)); }
-      .mind-learn-box { stroke-dashoffset: 0; opacity: 1; }
+      .mind-learn-box,
+      .mind-learn-diag { stroke-dashoffset: 0; opacity: 1; }
     }
   </style>
 </head>
@@ -717,45 +807,67 @@
   <div class="page-surface">
     <main>
       <!-- ============ WHAT IT IS / HERO ============ -->
-      <section class="hero">
-        <p class="kicker rise d1">Your mind. Your representation.</p>
-        <h1 class="rise d2">You. <span class="accent">Digitalized.</span></h1>
-        <!-- <p class="sub rise d3">A living version of you that grows alongside you and represents you in the world.</p> -->
-        <div class="cta-row rise d4">
-          <!-- <a class="btn btn-subtle" href="#start">Store your mind</a>
-          <a class="btn btn-subtle" href="#start">Share your mind</a> -->
-        </div>
-      </section>
+      <!-- first screen: hero fills the viewport down to the middle, the rest flows below -->
+      <div class="first-screen">
+        <section class="hero">
+          <!-- <p class="kicker rise d1">Your mind. Your representation.</p> -->
+          <h1 class="rise d2"><span class="mind-lead">Your mind.</span> <span class="accent" id="mindWord">Extended.</span></h1>
 
-      <!-- hero visual: the mind-orb. Swap for a real render/video later. -->
-      <div class="orb-stage rise d5">
-        <div class="orb-field" aria-hidden="true"></div>
+          <div class="cta-row rise d4">
+            <!-- <a class="btn btn-subtle" href="#start">Store your mind</a>
+            <a class="btn btn-subtle" href="#start">Share your mind</a> -->
+          </div>
+        </section>
+
+        <!-- hero visual: the mind-orb. Swap for a real render/video later. -->
+        <div class="hero-visual">
+          <div class="orb-stage rise d5">
+            <div class="orb-field" aria-hidden="true"></div>
+          </div>
+          <p class="sub rise d6">It learns, therefore it knows.</p>
+        </div>
       </div>
 
-      <!-- ============ BENEFIT · PERPETUAL COGNITION (orb above is its visual) ============ -->
-      <section class="block block-epigraph reveal">
-        <!-- <p class="eyebrow">Perpetual cognition</p> -->
-        <h2>It learns therefore it knows</h2>
-        <p>It captures context continuously so your digital self stays complete and up-to-date.</p>
-        <div class="visual mind-learn-visual" role="img" aria-label="Your mind connected to everyday inputs">
-          <svg class="mind-learn-connector" aria-hidden="true">
-            <path class="mind-learn-box" pathLength="1" />
-          </svg>
-          <div class="mind-learn-labels">
-            <span class="mind-label tl">your conversations</span>
-            <span class="mind-label bl">your activity</span>
-            <span class="mind-label tr">your knowledge</span>
-            <span class="mind-label br">your experiences</span>
-          </div>
+    <!-- ============ PERPETUAL COGNITION ============ -->
+    <section class="block reveal perpetual-section">
+      <div class="perpetual-intro">
+        <p class="eyebrow">Perpetual cognition</p>
+       It captures and stores context continuously from diverse sources so your digital self stays complete and up-to-date.</p>
+      </div>
+      <div class="visual mind-learn-visual" role="img" aria-label="Your mind connected to everyday inputs">
+        <svg class="mind-learn-connector" aria-hidden="true">
+          <path class="mind-learn-box" pathLength="1" />
+          <path class="mind-learn-diag mind-learn-diag1" pathLength="1" />
+          <path class="mind-learn-diag mind-learn-diag2" pathLength="1" />
+        </svg>
+        <div class="mind-learn-labels">
+          <span class="mind-label tl">your conversations</span>
+          <span class="mind-label bl">your activity</span>
+          <span class="mind-label tr">your knowledge</span>
+          <span class="mind-label br">your experiences</span>
         </div>
-      </section>
+      </div>
+    </section>
+
+        <!-- ============ BENEFIT · FRIENDS ============ -->
+        <section class="block chapter reveal">
+          <h2>Connect deeply</h2>
+          <p>Share a slice of your knowledge or opinions with friends. Get theirs back.</p>
+          <div class="visual benefit-visual mind-friends-visual" role="img" aria-label="You and a friend exchanging slices of mind">
+            <div class="mind-friends-field" aria-hidden="true"></div>
+            <div class="mind-friends-labels">
+              <span class="mind-friends-label left">you</span>
+              <span class="mind-friends-label right">your friend</span>
+            </div>
+          </div>
+        </section>
 
       <!-- ============ BENEFIT · TIME MACHINE ============ -->
-      <section class="block reveal">
-        <h2>Time travel through your mind</h2>
-        <p>Learn about who you were and what you thought at any point in time.</p>
+      <section class="block  reveal">
+        <h2>Time travel</h2>
+        <p>Go back to your previous states of mind and learn about who you were at any point in time.</p>
         <!-- VISUAL: replace .timeline with an image/screenshot of the time view -->
-        <div class="visual">
+        <div class="visual benefit-visual">
           <div class="timeline">
             <div class="nodes">
               <div class="node"><span class="dot"></span><small>2019</small></div>
@@ -768,68 +880,80 @@
         </div>
       </section>
 
-      
-
-      <!-- ============ BENEFIT · SPOKESPERSON ============ -->
-      <section class="block reveal">
-        <h2>Let it speak for you</h2>
-        <p>It speaks for you like your spokesperson so your voice gets heard. Share what you think and get rewarded for it.</p>
-        <!-- VISUAL: replace .agent with product screenshots -->
-        <div class="visual">
-          <div class="agent">
-            <div class="cell">
-              <div class="glyph">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="3" y="11" width="18" height="11" rx="2"/></svg>
-              </div>
-              <span>your views</span><br><span class="done">represented</span>
-            </div>
-            <div class="cell">
-              <div class="glyph">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              </div>
-              <span>decisions</span><br><span class="done">handled</span>
-            </div>
-            <div class="cell">
-              <div class="glyph">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 4.86L20 8.18l-4 3.9.94 5.5L12 15.77l-4.94 2.81.94-5.5-4-3.9 5.6-.32L12 2z"/></svg>
-              </div>
-              <span>rewarded</span><br><span class="done">if applicable</span>
-            </div>
-            <div class="cell">
-              <div class="glyph">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-              </div>
-              <span>on your terms</span><br><span class="done">always</span>
-            </div>
-          </div>
-        </div>
-      </section>
 
 
-    <!-- ============ BENEFIT · FRIENDS ============ -->
-    <section class="block reveal">
-      <h2>Connect more deeply with friends</h2>
-      <p>Share a slice of your knowledge or opinions with friends. Get theirs back.</p>
-      <div class="visual mind-friends-visual" role="img" aria-label="You and a friend exchanging slices of mind">
-        <div class="mind-friends-field" aria-hidden="true"></div>
-        <div class="mind-friends-labels">
-          <span class="mind-friends-label left">you</span>
-          <span class="mind-friends-label right">your friend</span>
+
+    </section>
+
+    <!-- ============ BENEFIT · REMEMBER EVERYTHING ============ -->
+    <section class="block reveal benefit-follow">
+      <h2>Remember everything</h2>
+      <p>Finite memory is no longer a limitation. Your digital mind stores everything that matters.</p>
+      <div class="visual benefit-visual" role="img" aria-label="Memories stored without limit">
+        <div class="memory-stack">
+          <div class="memory-layer">a conversation in Paris</div>
+          <div class="memory-layer">your experience working remotely</div>
+          <div class="memory-layer">who you were in 2019</div>
+          <div class="memory-layer faded">…</div>
         </div>
       </div>
     </section>
+
+
+        <!-- ============ BENEFIT · SPOKESPERSON ============ -->
+        <section class="block reveal benefit-follow">
+          <h2>Be represented</h2>
+          <p>It speaks like your spokesperson-share what you think, and only what you choose. Oh, and get rewarded.</p>
+          <!-- VISUAL: replace .agent with product screenshots -->
+          <div class="visual benefit-visual">
+            <div class="agent">
+              <div class="cell">
+                <div class="glyph">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="3" y="11" width="18" height="11" rx="2"/></svg>
+                </div>
+                <span>your views</span><br><span class="done">represented</span>
+              </div>
+              <div class="cell">
+                <div class="glyph">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span>decisions</span><br><span class="done">optimized</span>
+              </div>
+              <div class="cell">
+                <div class="glyph">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 4.86L20 8.18l-4 3.9.94 5.5L12 15.77l-4.94 2.81.94-5.5-4-3.9 5.6-.32L12 2z"/></svg>
+                </div>
+                <span>rewarded</span><br><span class="done">whenever applicable</span>
+              </div>
+              <div class="cell">
+                <div class="glyph">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <span>on your terms</span><br><span class="done">always</span>
+              </div>
+            </div>
+          </div>
       
 
+
+    
+
+
+
       <!-- ============ ACTION ============ -->
-      <section class="action reveal" id="start">
-        <h2>Digitalize your mind.<br><span class="accent">And share pieces of it.</span></h2>
-        <p>Create your digital self and share what you choose with friends, businesses, and more.</p>
+      <section class="action chapter reveal" id="start">
+        <h2>
+          Say hello to your
+          <span class="accent">extended mind.</span></h2>
+        <p>And share what you choose with friends, businesses, and more.</p>
         <div class="cta-row">
           <!-- TODO: point to the real app / waitlist -->
           <a class="btn btn-ghost" href="#">Get started</a>
         </div>
       </section>
     </main>
+
+
 
     <footer class="site-footer reveal">
       <p class="footer-brand">REP<span class="accent">.</span></p>
@@ -840,7 +964,7 @@
         <a href="#">Privacy</a>
         <a href="#">Terms</a>
       </nav>
-      <p class="footer-meta">© 2026 REP · Built for the version of you that lasts.</p>
+      <p class="footer-meta">© 2026 REP · For the future of cognition.</p>
     </footer>
   </div>
 
@@ -864,53 +988,157 @@
     document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
     const learnVisual = document.querySelector('.mind-learn-visual');
+    function lockConnectorPath(path) {
+      if (!path) return;
+      path.style.strokeDashoffset = '0';
+      path.style.opacity = '1';
+    }
+
+    function learnClusterOffsets(w, h) {
+      const ox = Math.min(128, Math.max(84, w * 0.21));
+      const oy = Math.min(30, Math.max(18, h * 0.11));
+      return {
+        tl: [-ox, -oy],
+        tr: [ox, -oy],
+        bl: [-ox, oy],
+        br: [ox, oy],
+      };
+    }
+
+    function prepareLearnLabels(finalOnly = false) {
+      if (!learnVisual) return;
+      const w = learnVisual.clientWidth;
+      const h = learnVisual.clientHeight;
+      if (!w || !h) return;
+      const vr = learnVisual.getBoundingClientRect();
+      const cx = w / 2;
+      const cy = h / 2;
+      const targets = learnClusterOffsets(w, h);
+
+      ['tl', 'tr', 'bl', 'br'].forEach((cls) => {
+        const el = learnVisual.querySelector(`.mind-label.${cls}`);
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const fromX = r.left - vr.left + r.width / 2 - cx;
+        const fromY = r.top - vr.top + r.height / 2 - cy;
+        const [toX, toY] = targets[cls];
+
+        el.style.top = '50%';
+        el.style.left = '50%';
+        el.style.right = 'auto';
+        el.style.bottom = 'auto';
+        el.style.setProperty('--from-x', `${fromX}px`);
+        el.style.setProperty('--from-y', `${fromY}px`);
+        el.style.setProperty('--to-x', `${toX}px`);
+        el.style.setProperty('--to-y', `${toY}px`);
+
+        const x = finalOnly ? toX : fromX;
+        const y = finalOnly ? toY : fromY;
+        el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+      });
+    }
+
     function layoutLearnConnector() {
       if (!learnVisual) return;
       const svg = learnVisual.querySelector('.mind-learn-connector');
-      const path = svg && svg.querySelector('.mind-learn-box');
-      if (!path) return;
+      const boxPath = svg && svg.querySelector('.mind-learn-box');
+      const diag1 = svg && svg.querySelector('.mind-learn-diag1');
+      const diag2 = svg && svg.querySelector('.mind-learn-diag2');
+      if (!boxPath) return;
       const w = learnVisual.clientWidth;
       const h = learnVisual.clientHeight;
       if (!w || !h) return;
       svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
       const vr = learnVisual.getBoundingClientRect();
-      const boxRect = (cls) => learnVisual.querySelector(`.mind-label.${cls}`).getBoundingClientRect();
-      const rel = (r) => ({
-        left: r.left - vr.left,
-        right: r.right - vr.left,
-        top: r.top - vr.top,
-        bottom: r.bottom - vr.top,
-      });
-      const tl = rel(boxRect('tl'));
-      const tr = rel(boxRect('tr'));
-      const bl = rel(boxRect('bl'));
+      const centerOf = (cls) => {
+        const el = learnVisual.querySelector(`.mind-label.${cls}`);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          x: r.left - vr.left + r.width / 2,
+          y: r.top - vr.top + r.height / 2,
+        };
+      };
 
-      const hx = Math.max(10, ((tr.left - tl.right) * 0.48));
-      const hy = Math.max(8, ((bl.top - tl.bottom) * 0.48));
-      const cx = w * 0.5;
-      const cy = h * 0.5;
+      const tl = centerOf('tl');
+      const tr = centerOf('tr');
+      const br = centerOf('br');
+      const bl = centerOf('bl');
+      if (!tl || !tr || !br || !bl) return;
 
-      path.setAttribute(
+      const fmt = (p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+      boxPath.setAttribute(
         'd',
-        `M ${cx - hx} ${cy - hy} L ${cx + hx} ${cy - hy} L ${cx + hx} ${cy + hy} L ${cx - hx} ${cy + hy} Z`
+        `M ${fmt(tl)} L ${fmt(tr)} L ${fmt(br)} L ${fmt(bl)} Z`
       );
+      if (diag1) diag1.setAttribute('d', `M ${fmt(tl)} L ${fmt(br)}`);
+      if (diag2) diag2.setAttribute('d', `M ${fmt(tr)} L ${fmt(bl)}`);
+
+      if (learnVisual.classList.contains('connectors-visible')) {
+        lockConnectorPath(boxPath);
+        lockConnectorPath(diag1);
+        lockConnectorPath(diag2);
+      }
+    }
+
+    function scheduleLearnConnectorLayout() {
+      requestAnimationFrame(() => requestAnimationFrame(layoutLearnConnector));
     }
 
     if (learnVisual) {
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let labelsSettled = 0;
+      let connectorsLaidOut = false;
+      let connectorDrawsDone = 0;
+
+      learnVisual.addEventListener('animationend', (e) => {
+        if (e.target.classList.contains('mind-label')) {
+          if (e.animationName !== 'learnMoveLabel') return;
+          labelsSettled += 1;
+          if (labelsSettled >= 4 && !connectorsLaidOut) {
+            connectorsLaidOut = true;
+            scheduleLearnConnectorLayout();
+          }
+          return;
+        }
+
+        if (e.animationName !== 'learnBoxDraw') return;
+        if (!e.target.matches('.mind-learn-box, .mind-learn-diag')) return;
+        lockConnectorPath(e.target);
+        connectorDrawsDone += 1;
+        if (connectorDrawsDone >= 3 || reduceMotion) {
+          learnVisual.classList.add('connectors-visible');
+          const svg = learnVisual.querySelector('.mind-learn-connector');
+          lockConnectorPath(svg && svg.querySelector('.mind-learn-box'));
+          lockConnectorPath(svg && svg.querySelector('.mind-learn-diag1'));
+          lockConnectorPath(svg && svg.querySelector('.mind-learn-diag2'));
+        }
+      });
+
       const learnIo = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            learnVisual.classList.add('play');
-            setTimeout(layoutLearnConnector, reduceMotion ? 50 : 2050);
+            prepareLearnLabels(reduceMotion);
+            if (reduceMotion) {
+              learnVisual.classList.add('play');
+              connectorsLaidOut = true;
+              scheduleLearnConnectorLayout();
+              learnVisual.classList.add('connectors-visible');
+              const svg = learnVisual.querySelector('.mind-learn-connector');
+              lockConnectorPath(svg && svg.querySelector('.mind-learn-box'));
+              lockConnectorPath(svg && svg.querySelector('.mind-learn-diag1'));
+              lockConnectorPath(svg && svg.querySelector('.mind-learn-diag2'));
+            } else {
+              requestAnimationFrame(() => learnVisual.classList.add('play'));
+            }
             learnIo.unobserve(e.target);
           }
         });
       }, { threshold: 0.35 });
       learnIo.observe(learnVisual);
       window.addEventListener('resize', () => {
-        if (learnVisual.classList.contains('play')) layoutLearnConnector();
+        if (learnVisual.classList.contains('play')) scheduleLearnConnectorLayout();
       });
     }
 
@@ -937,6 +1165,33 @@
         if (w >= 1000) return base * 0.21;
         if (w >= 760) return base * 0.20;
         return base * 0.19;
+      }
+
+      function layoutFriendsLabels() {
+        const visual = document.querySelector('.mind-friends-visual');
+        const field = visual && visual.querySelector('.mind-friends-field');
+        const labels = visual && visual.querySelector('.mind-friends-labels');
+        if (!field || !labels) return;
+        const w = field.clientWidth;
+        const h = field.clientHeight;
+        if (!w || !h) return;
+
+        const xOff = w * orbSpread(w);
+        const r = friendsOrbR(w, h);
+        const labelY = h / 2 + r * 1.06 + 8;
+        const leftX = w / 2 - xOff;
+        const rightX = w / 2 + xOff;
+
+        const left = labels.querySelector('.mind-friends-label.left');
+        const right = labels.querySelector('.mind-friends-label.right');
+        if (left) {
+          left.style.left = `${leftX}px`;
+          left.style.top = `${labelY}px`;
+        }
+        if (right) {
+          right.style.left = `${rightX}px`;
+          right.style.top = `${labelY}px`;
+        }
       }
 
       function sphereParticleClass(p, getR) {
@@ -1135,6 +1390,7 @@
             for (let i = 0; i < 14; i++) streamParts.push(new StreamParticle('out', i, leftParts));
             for (let i = 0; i < 14; i++) streamParts.push(new StreamParticle('back', i, rightParts));
             p.noFill();
+            layoutFriendsLabels();
           };
 
           p.draw = () => {
@@ -1173,6 +1429,7 @@
             const { w, h } = dims();
             p.resizeCanvas(w, h);
             orbR = friendsOrbR(w, h);
+            layoutFriendsLabels();
           };
         };
 
@@ -1181,7 +1438,38 @@
 
       mountHeroOrb(document.querySelector('.orb-field'));
       mountFriendsSwap(document.querySelector('.mind-friends-field'));
+      layoutFriendsLabels();
+      window.addEventListener('resize', layoutFriendsLabels);
     })();
+
+    // cycle the hero word through synonyms
+    (function () {
+      const el = document.getElementById('mindWord')
+      if (!el) return
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (reduce) return
+      const WORDS = ['Extended.', 'Enhanced.', 'On steroids.', 'Amplified.', 'Supercharged.', 'Unleashed.', 'Upgraded.', 'Limitless.']
+      // reserve the widest word's width so the preceding text stays put
+      function fit() {
+        const prev = el.textContent
+        el.style.width = 'auto'
+        let max = 0
+        for (const w of WORDS) { el.textContent = w; max = Math.max(max, el.offsetWidth) }
+        el.textContent = prev
+        el.style.width = Math.ceil(max) + 'px'
+      }
+      fit()
+      window.addEventListener('resize', fit, { passive: true })
+      let i = 0
+      setInterval(() => {
+        el.classList.add('swap')
+        setTimeout(() => {
+          i = (i + 1) % WORDS.length
+          el.textContent = WORDS[i]
+          el.classList.remove('swap')
+        }, 450)
+      }, 2400)
+    })()
   </script>
 </body>
 </html>
